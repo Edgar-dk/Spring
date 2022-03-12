@@ -1,0 +1,24 @@
+package com.sias.IOC.Class;
+
+/**
+ * @author shkstart
+ * @create 2022-01-07 17:35
+ */
+
+
+/*
+* 内部bean的注入类*/
+public class Dept {
+    private String dname;
+
+    public void setDname(String dname) {
+        this.dname = dname;
+    }
+
+    @Override
+    public String toString() {
+        return "Dept{" +
+                "dname='" + dname + '\'' +
+                '}';
+    }
+}

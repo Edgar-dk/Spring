@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
+        xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+                          http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
+                          http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+                          http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd
+                          http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+<!--Spring的Bean帮助去 创建对象 和 注入属性等-->
+
+
+
+<!--&lt;!&ndash;1.测试第一个代码（外部注入，set的方式）&ndash;&gt;-->
+    <!--01.配置创建的对象
+           id是在加载这个创建的对象的时候，去找到对应
+           的，class是地址（是创建对象的地址）-->
+    <bean id="userservice01" class="com.sias.IOC.Service.Userservice">
+        <property name="userDao" ref="s"></property>
+    </bean>
+    <!--02.因为在Userservice中有userDao，要去
+          调用userDao的方法，所以要去创建userDao这个对象，然后在注入到Userservice
+          对象中，s是地址-->
+    <bean id="s" class="com.sias.IOC.Dao.UserDaoImpl"></bean>
+
+
+
+<!--   2.内部注入类
+         propetry是属性-->
+    <bean id="empl01" class="com.sias.IOC.Class.Empl">
+        <property name="ename" value="张三"></property>
+        <property name="esex"  value="男"></property>
+        <!--01.内部的方式去注入一个类，property是属性明，在这个标签里，在写
+               其他的标签，表示要这个类中的属性引入到empl中-->
+        <property name="dept">
+            <bean id="dept01" class="com.sias.IOC.Class.Dept">
+                <property name="dname" value="安保部"></property>
+            </bean>
+        </property>
+    </bean>
+
+
+
+
+<!--   3. 级联复制-->
+    <bean id="empl02" class="com.sias.IOC.Class.Empl">
+        <property name="ename" value="张三"></property>
+        <property name="esex"  value="男"></property>
+        <property name="dept" ref="dept01"></property>
+<!--        <property name="dept.dname" value="技术部"></property>-->
+    </bean>
+    <bean id="dept01" class="com.sias.IOC.Class.Dept">
+        <property name="dname" value="财务部"></property>
+    </bean>
+
+
+
+
+
+
+<!--    4.集合的配置（set的方式）-->
+    <bean id="student01" class="com.sias.IOC1.collectiontype.Student">
+        <!--00.分析：至于为什么不在name后面写value因为这是集合的形式，是可以写上很多的数据
+        所以在<property>中写上<array>可以在里面写上很多的数据-->
+        <!--01.集合的输入-->
+        <property name="course" >
+            <array>
+                <value>java课程</value>
+                <value>数据库课程</value>
+                <value>大数据</value>
+                <value>云计算</value>
+                <value>大学物理</value>
+                <value>概率论</value>
+            </array>
+        </property>
+        <!--02.list的输入-->
+        <property name="lname" >
+            <list>
+                <value>张三</value>
+                <value>三张</value>
+                <value>小三张</value>
+            </list>
+        </property>
+        <!--03.map的输入-->
+        <property name="map" >
+            <!--map是简直对，是两个-->
+            <map>
+                <entry key="JAVA" value="java"></entry>
+                <entry key="PYTHON" value="python"></entry>
+            </map>
+        </property>
+        <!--04.set的注入-->
+        <property name="set" >
+            <set>
+                <value>MySQL</value>
+                <value>Spring</value>
+                <value>MVC</value>
+            </set>
+        </property>
+        <!--05.注入list，数据类型是对象，所以在list中写的是对象地址的别名-->
+        <property name="courseList">
+            <list>
+                <ref bean="course01"></ref>
+                <ref bean="course02"></ref>
+            </list>
+        </property>
+    </bean>
+    <!--   下面的是为了给course中课程名字起的实体的名字 -->
+    <bean id="course01" class="com.sias.IOC1.collectiontype.Course">
+        <property name="cname" value="Spring5框架"></property>
+    </bean>
+    <bean id="course02" class="com.sias.IOC1.collectiontype.Course">
+        <property name="cname" value="MySQL升级版"></property>
+    </bean>
+
+
+<!--    5.合提取出来公共使用（set的方式）-->
+    <util:list id="bookList">
+        <!--List的形式，所以需要多个的形式输出-->
+        <value>大学物理</value>
+        <value>大学英语</value>
+        <value>大学数学</value>
+    </util:list>
+    <bean id="book01" class="com.sias.IOC1.collectiontype.Book">
+        <property name="list" ref="bookList"></property>
+    </bean>
+
+
+
+<!--    6.工厂bean-->
+    <bean id="mybean01" class="com.sias.IOC1.factorybean.Mybean"></bean>
+
+
+
+
+
+<!--   7. Bean的生命周期-->
+    <bean id="orders01" class="com.sias.IOC1.Bean.Orders" init-method="initMethod1" destroy-method="destroyMethod">
+        <property name="oname" value="手机"></property>
+    </bean>
+
+
+
+<!--    8.自动创建-->
+    <bean id="emp01" class="com.sias.IOC1.automic.Emp" autowire="byName">
+<!--        <property name="dept" ref="dept"></property>-->
+    </bean>
+    <bean id="dept" class="com.sias.IOC1.automic.Dept">
+    </bean>
+
+
+
+
+
+
+
+<!--    10.外部文件引入XML中配置信息
+           目的：就是在需要更改外面的配置信心的时候，直接更该最外面文件中的信息，即可-->
+<!--    <context:property-placeholder location="classpath:jdbc.properties"/>-->
+<!--    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">-->
+<!--        <property name="url" value="${prop.url}" />-->
+<!--        <property name="username" value="${prop.userName}" />-->
+<!--        <property name="password" value="${prop.password}" />-->
+<!--        <property name="driverClassName" value="${prop.driverClass}" />-->
+<!--    </bean>-->
+
+
+
+
+
+<!--    11.注解的方式去创建对象（下面的注解是扫描包，是注解的形式，就去创建）-->
+    <context:component-scan base-package="com.sias.IOC2"></context:component-scan>
+
+
+<!--&lt;!&ndash;    12.注解的方式去AOP的增强方法&ndash;&gt;-->
+<!--    扫描的是Aopanno这个包小的类，有的话，在去创建对象-->
+    <context:component-scan base-package="com.sias.AOP.Aopanno"></context:component-scan>
+<!--    生成代理对象-->
+    <aop:aspectj-autoproxy></aop:aspectj-autoproxy>
+
+
+
+
+<!--        13.增强的方法去操作数据库基本的数据库连接池-->
+<!--    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">-->
+<!--        <property name="url" value="jdbc:mysql://localhost:3306/root" />-->
+<!--        <property name="username" value="root" />-->
+<!--        <property name="password" value="root" />-->
+<!--        <property name="driverClassName" value="com.mysql.jdbc.Driver" />-->
+<!--    </bean>-->
+<!--&lt;!&ndash;     分析，至于为什么这样写的原因，你可以能在后面看代码的时候，会认为，我没有去从创建一个类，但是这个类-->
+<!--的可以去创建对象，原因就是我导入了Java相关的包，可以用这些包下的类去创建对象又因为有多种方式去创建，这里使用的-->
+<!--是set的方式去创建的，没有使用构造方法的方式去创建&ndash;&gt;-->
+<!--    <bean id="jdbcTemplate01" class="org.springframework.jdbc.core.JdbcTemplate">-->
+<!--        <property name="dataSource" ref="dataSource"></property>-->
+<!--    </bean>-->
+<!--    <context:component-scan base-package="com.sias.JDBCTmplate"></context:component-scan>-->
+
+
+
+
+
+<!--14.事务的方式（就是提交）去去操作银行转账
+       有的地方，正确了也是出现错误，可能是包之间的依赖吧，以后写项目一定要分开写-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource">
+        <property name="url" value="jdbc:mysql://localhost:3306/root" />
+        <property name="username" value="root" />
+        <property name="password" value="root" />
+        <property name="driverClassName" value="com.mysql.jdbc.Driver" />
+    </bean>
+
+    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+    <context:component-scan base-package="com.sias.Affairs"></context:component-scan>
+
+
+<!--    01.事务管理器-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"></property>
+    </bean>
+<!--    02.开始事务注解-->
+    <tx:annotation-driven transaction-manager="transactionManager"></tx:annotation-driven>
+
+</beans>
